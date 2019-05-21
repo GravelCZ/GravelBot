@@ -1,12 +1,15 @@
 package cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import cz.GravelCZLP.Bot.Utils.Utils;
 import sx.blah.discord.handle.audio.IAudioProvider;
@@ -21,7 +24,11 @@ public class HttpAudioProvider implements IAudioProvider, IPlayerProvider {
 		AudioInputStream originalStream = null;
 		
 		try {
-			originalStream = AudioSystem.getAudioInputStream(Utils.getInputStreamFromURL(url, new HashMap<String, String>()));
+			Pair<InputStream, Integer> resp = Utils.getInputStreamFromURL(url, new HashMap<String, String>());
+			if (resp.getValue() != 200) {
+				return;
+			}
+			originalStream = AudioSystem.getAudioInputStream(resp.getKey());
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

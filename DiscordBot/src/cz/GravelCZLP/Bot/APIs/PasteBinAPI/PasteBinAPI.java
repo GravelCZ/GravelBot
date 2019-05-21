@@ -27,7 +27,7 @@ public class PasteBinAPI implements IAPI {
 					+ "&api_paste_code=" + URLEncoder.encode(content, "UTF-8");
 			HashMap<String, String> headers = new HashMap<>();
 			headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-			return Utils.makeUrlPostRequest(new URL(url), headers, data);
+			return Utils.makeUrlPostRequest(new URL(url), headers, data).getKey();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -42,7 +42,7 @@ public class PasteBinAPI implements IAPI {
 					+ "&api_user_password=" + URLEncoder.encode(Constants.pastebinPassword, "UTF-8");
 			HashMap<String, String> headers = new HashMap<>();
 			headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-			return Utils.makeUrlPostRequest(new URL(url), headers, data);
+			return Utils.makeUrlPostRequest(new URL(url), headers, data).getKey();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

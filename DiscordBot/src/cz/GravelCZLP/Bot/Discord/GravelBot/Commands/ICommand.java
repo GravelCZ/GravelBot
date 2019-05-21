@@ -11,6 +11,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
+import sx.blah.discord.util.RequestBuffer.IRequest;
+import sx.blah.discord.util.RequestBuffer.IVoidRequest;
+import sx.blah.discord.util.RequestBuffer.RequestFuture;
 
 public interface ICommand {
 
@@ -24,6 +27,14 @@ public interface ICommand {
 	
 	default Optional<IChannel> getBotSpamChannel(IGuild g) {
 		return g.getChannelsByName(Constants.textChatCommands).stream().findFirst();
+	}
+	
+	default void requestVoid(IVoidRequest req) {
+		RequestBuffer.request(req);
+	}
+	
+	default <T> RequestFuture<T> requestResponse(IRequest<T> req) {
+		return RequestBuffer.request(req);
 	}
 	
 	default void sendMessage(IChannel c, String text) {

@@ -29,7 +29,7 @@ public class TwitchAPI implements IAPI {
 		headers.put("Accept", "application/vnd.twitchtv.v5+json");
 
 		try {
-			return Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/helix/users?login=" + name), headers, false);
+			return Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/helix/users?login=" + name), headers, false).getKey();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -42,7 +42,7 @@ public class TwitchAPI implements IAPI {
 		headers.put("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0");
 		headers.put("Client-ID", Constants.twitchId);
 		try {
-			return Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/kraken/streams/" + name), headers, false);
+			return Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/kraken/streams/" + name), headers, false).getKey();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -61,7 +61,7 @@ public class TwitchAPI implements IAPI {
 					.makeUrlPostRequest(
 							new URL("https://id.twitch.tv/oauth2/token?client_id=" + Constants.twitchId
 									+ "&client_secret=" + Constants.twitchSecret + "&grant_type=client_credentials"),
-							headers, null);
+							headers, null).getKey();
 
 			JSONObject obj = new JSONObject(out);
 			token = obj.getString("access_token");

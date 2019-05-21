@@ -18,7 +18,6 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MojangAPIComm
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.RandomWikipedaArticle;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.ReactOOFCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.ServerHelpCommand;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.TheYTWarCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.UptimeCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.WynncraftAPICommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.AdminCommands.DeleteAllCommandServer;
@@ -49,6 +48,9 @@ public class MainCommandManager {
 	}
 	
 	public void init() {
+		QAHandler handler = new QAHandler();
+		handler.init();
+		
 		//commands for PM
 		privateCommands.put("deleteall", new DeleteAllCommand());
 		privateCommands.put("getmyid", new GetMyIDCommand());
@@ -65,7 +67,7 @@ public class MainCommandManager {
 		serverCommands.put("deepfry", new DeepFryerCommand());
 		serverCommands.put("help", new ServerHelpCommand());
 		serverCommands.put("about", new AboutCommand());
-		serverCommands.put("theytwar", new TheYTWarCommand());
+		//serverCommands.put("theytwar", new TheYTWarCommand());
 		serverCommands.put("mcinfo", new McInfoCommand());
 		serverCommands.put("wynncraftapi", new WynncraftAPICommand());
 		serverCommands.put("mojangapi", new MojangAPICommand());
@@ -73,9 +75,6 @@ public class MainCommandManager {
 		serverCommands.put("uptime", new UptimeCommand());
 		serverCommands.put("oof", new ReactOOFCommand());
 		//serverCommands.put("allemojis", new AllEmojisCommand());
-		
-		QAHandler handler = new QAHandler();
-		handler.init();
 		
 		serverCommands.put("question", new QuestionCommand(handler));
 		serverCommands.put("answer", new AnswerCommand(handler));

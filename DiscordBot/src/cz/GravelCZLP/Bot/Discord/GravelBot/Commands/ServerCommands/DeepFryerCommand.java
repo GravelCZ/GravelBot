@@ -29,6 +29,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.PermissionsService;
@@ -110,8 +111,15 @@ public class DeepFryerCommand implements ICommand {
 						return;
 					}
 
-					byte[] image = Utils.downloadFile(url, new HashMap<>());
+					Pair<byte[], Integer> imageResp = Utils.downloadFile(url, new HashMap<>());
 
+					if (imageResp.getValue() != 200) {
+						sendMessage(channel, "Got response code: " + imageResp);
+						return;
+					}
+					
+					byte[] image = imageResp.getKey();
+					
 					System.out.println("Image downloaded!");
 
 					RenderedImage original = ImageIO.read(new ByteArrayInputStream(image));

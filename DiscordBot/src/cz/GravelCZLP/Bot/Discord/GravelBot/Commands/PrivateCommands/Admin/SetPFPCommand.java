@@ -2,19 +2,18 @@ package cz.GravelCZLP.Bot.Discord.GravelBot.Commands.PrivateCommands.Admin;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
-import cz.GravelCZLP.Bot.Utils.IRequestArgs;
+import cz.GravelCZLP.Bot.Utils.Logger;
+import cz.GravelCZLP.Bot.Utils.RequestResponse;
 import cz.GravelCZLP.Bot.Utils.Utils;
-import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -39,7 +38,7 @@ public class SetPFPCommand implements ICommand {
 
 	@Override
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
-		if ((System.currentTimeMillis() - lastImageChange) < 11 * 60 * 1000) {
+		if ((System.currentTimeMillis() - lastImageChange) < 10.5 * 60 * 1000) {
 			sendMessage(channel, "I cannot change my profile picture this fast.");
 			return;
 		}
@@ -61,10 +60,11 @@ public class SetPFPCommand implements ICommand {
 					id = Long.parseLong(args[1]);
 				} catch (NumberFormatException e) {
 					sendMessage(channel, "Not a valid id.");
+					return;
 				}	
 				IUser user = msg.getClient().getUserByID(id);
 				if (user == null) {
-					RequestFuture<IUser> userFuture = RequestBuffer.request(new IRequestArgs<IUser, Long>(id) {
+					RequestFuture<IUser> userFuture = RequestBuffer.request(new RequestResponse<IUser, Long>(id) {
 						
 						@Override
 						public IUser request() {
@@ -75,12 +75,14 @@ public class SetPFPCommand implements ICommand {
 					user = userFuture.get();
 				}
 				if (user == null) {
-					sendMessage(channel, "Cannot get the user, does the user exist and can the bot see him ?(They need to have mutual guild");
+					sendMessage(channel, "Cannot get the user, does the user exist and can the bot see him ?(They need to have mutual guild)");
 					return;
 				}
-				urlTxt = user.getAvatar();
+				urlTxt = user.getAvatarURL();
 			}
 		}
+		
+		Logger.log(urlTxt);
 		
 		boolean isImage = Utils.isImage(urlTxt) || Utils.isGif(urlTxt) || urlTxt.endsWith(".webp");
 		if (!isImage) {
@@ -97,18 +99,17 @@ public class SetPFPCommand implements ICommand {
 			return;
 		}
 		
-		byte[] image = Utils.downloadFile(url, new HashMap<>());
+		Pair<byte[], Integer> imageResp = Utils.downloadFile(url, new HashMap<>());
+		if (imageResp.getValue() != 200) {
+			sendMessage(channel, "Got response code: " + imageResp.getValue());
+			return;
+		}
+		
+		byte[] image = imageResp.getKey();
 		String name = Utils.toB64(Utils.sha256(image));
 		String suffix = FilenameUtils.getExtension(urlTxt);
 		File f = new File("./BotDataFolder/profilePics/" + name + "." + suffix);
 		
-		if (f.exists()) {
-			RequestBuffer.request(() -> {
-				msg.getClient().changeAvatar(Image.forFile(f));
-				channel.sendMessage("I changed my profile picture!");
-			});
-			return;
-		}
 		try {
 			f.createNewFile();
 			FileOutputStream fos = new FileOutputStream(f);
@@ -119,20 +120,13 @@ public class SetPFPCommand implements ICommand {
 			e.printStackTrace();
 		}
 		
-		IDiscordClient client = channel.getClient();
-		String imageData = String.format("data:image/%s;base64,%s", suffix, Base64.encodeBase64String(image));
-		try {
-			Class<?> clazz = client.getClass();
-			Method met = clazz.getDeclaredMethod("changeAccountInfo", String.class, String.class);
-			met.invoke(clazz, client.getOurUser().getName(), imageData);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (f.exists()) {
+			RequestBuffer.request(() -> {
+				msg.getClient().changeAvatar(Image.forFile(f));
+				channel.sendMessage("I changed my profile picture!");
+			});
 		}
 		
-		
-		RequestBuffer.request(() -> {
-			channel.sendMessage("I changed my profile picture!");
-		});
 		lastImageChange = System.currentTimeMillis();
 	}
 

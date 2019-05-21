@@ -29,7 +29,7 @@ public class PlayCommand implements ICommand {
 			} catch (Exception e1) {
 				channel.sendMessage(e1.getMessage());
 				e1.printStackTrace();
-			}	
+			}
 		} else {
 			String address = args[0];
 			URL url = null;

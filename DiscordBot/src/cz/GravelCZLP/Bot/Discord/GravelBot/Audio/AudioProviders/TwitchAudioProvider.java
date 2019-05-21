@@ -12,6 +12,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Events.TwitchStreamEndEvent;
@@ -39,9 +40,18 @@ public class TwitchAudioProvider implements IAudioProvider, IPlayerProvider {
 		
 		headers.put("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0");
 		
-		String out = Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/api/channels/" + twitchName + "/access_token?client_id=" + Constants.twitchId), headers, false);
+		Pair<String, Integer> out = Utils.makeUrlGetRequest(new URL("https://api.twitch.tv/api/channels/" + twitchName + "/access_token?client_id=" + Constants.twitchId), headers, false);
 		
-		Logger.debug("Twitch Reply: " + out);
+		if (out.getValue() != 200) {
+			List<IChannel> channels = g.getChannelsByName(Constants.textChatCommands);
+			if (channels == null || channels.isEmpty()) {
+				return;
+			}
+			channels.get(0).sendMessage("Something went wrong with comunicationg with Twitch API. Check the logs for more information.");
+			return;
+		}
+		 
+		Logger.debug("Twitch Reply: " + out.getKey());
 		
 		JSONObject obj = new JSONObject(out);
 		
@@ -50,9 +60,18 @@ public class TwitchAudioProvider implements IAudioProvider, IPlayerProvider {
 		
 		String infoUrl = "https://usher.ttvnw.net/api/channel/hls/" + twitchName + "?client_id=s16augpdjkvaj79cp6b25pflx7p867&token=" + URLEncoder.encode(token, "UTF-8") + "&sig=" + sig + "&allow_source&allow_audio_only";
 		
-		String out2 = Utils.makeUrlGetRequest(new URL(infoUrl), headers, true);
+		Pair<String, Integer> out2 = Utils.makeUrlGetRequest(new URL(infoUrl), headers, true);
 		
-		String[] split = out2.split("\\r?\\n");
+		if (out2.getValue() != 200) {
+			List<IChannel> channels = g.getChannelsByName(Constants.textChatCommands);
+			if (channels == null || channels.isEmpty()) {
+				return;
+			}
+			channels.get(0).sendMessage("Something went wrong with comunicationg with Twitch API. Check the logs for more information.");
+			return;
+		}
+		
+		String[] split = out2.getKey().split("\\r?\\n");
 		String format = split[0];
 		
 		Logger.debug("Format: " + format);

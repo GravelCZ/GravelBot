@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,7 +25,7 @@ public class MojangAPI implements IAPI {
 	public static EnumMap<MojangService, Status> getStatus() {
 		EnumMap<MojangService, Status> map = new EnumMap<>(MojangService.class);
 		try {
-			String out = Utils.makeUrlGetRequest(new URL(statusUrl), new HashMap<>(), false);
+			String out = Utils.makeUrlGetRequest(new URL(statusUrl), new HashMap<>(), false).getKey();
 			JSONArray array = new JSONArray(out);
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject obj = array.getJSONObject(i);
@@ -43,25 +44,33 @@ public class MojangAPI implements IAPI {
 		return map;
 	}
 	
-	public static String[] getPlayerNameHistory(String uuid) {
+	public static Pair<String[], Integer> getPlayerNameHistory(String uuid) {
 		try {
-			String response = Utils.makeUrlGetRequest(new URL(nameHistory.replaceFirst("%UUID%", uuid)), new HashMap<>(), false);
+			Pair<String, Integer> r = Utils.makeUrlGetRequest(new URL(nameHistory.replaceFirst("%UUID%", uuid)), new HashMap<>(), false);
+			if (r.getValue() != 200) {
+				return Pair.of(null, r.getValue());
+			}
+			String response = r.getKey();
 			JSONArray list = new JSONArray(response);
 			String[] names = new String[list.length()];
 			for (int i = 0; i < list.length(); i++) {
 				JSONObject obj = list.getJSONObject(i);
 				names[i] = obj.getString("name");
 			}
-			return names;
+			return Pair.of(names, r.getValue());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 	
-	public static String getSkinUrl(String uuid) {
+	public static Pair<String, Integer> getSkinUrl(String uuid) {
 		try {
-			String resp = Utils.makeUrlGetRequest(new URL(profileInfo.replaceFirst("%UUID%", uuid)), new HashMap<>(), false);
+			Pair<String, Integer> r = Utils.makeUrlGetRequest(new URL(profileInfo.replaceFirst("%UUID%", uuid)), new HashMap<>(), false);
+			if (r.getValue() != 200) {
+				return Pair.of("", r.getValue());
+			}
+			String resp = r.getKey();
 			JSONObject obj = new JSONObject(resp);
 			JSONArray props = obj.getJSONArray("properties");
 			for (int i = 0; i < props.length(); i++) {
@@ -69,7 +78,7 @@ public class MojangAPI implements IAPI {
 				if (aobj.getString("name").equals("textures")) {
 					String value = aobj.getString("value");
 					JSONObject decoded = new JSONObject(new String(Base64.getDecoder().decode(value.getBytes("UTF-8"))));
-					return decoded.getJSONObject("textures").getJSONObject("SKIN").getString("url");
+					return Pair.of(decoded.getJSONObject("textures").getJSONObject("SKIN").getString("url"), r.getValue());
 				}
 			}
 		} catch (Exception e) {

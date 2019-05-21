@@ -17,7 +17,6 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.ChatCommandListener;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.GuildStuffListener;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.ShitpostHandler;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.DateCheckerRunnable;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.PewDiePieVsTGayRunnable;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.RedditShitpostRunnable;
 import cz.GravelCZLP.Bot.Main.Constants;
 import cz.GravelCZLP.Bot.Main.Main;
@@ -51,13 +50,11 @@ public class GravelBot implements IDiscordBot {
 
 		Runnable dateCheckerRunnable = new DateCheckerRunnable(client);
 		Runnable redditShitpostRunnable = new RedditShitpostRunnable(client);
-		Runnable PewDiePieVsTGayRunnable = new PewDiePieVsTGayRunnable(client);
 		
 		ScheduledExecutorService exec = Executors.newScheduledThreadPool(4);
 		
 		exec.scheduleAtFixedRate(dateCheckerRunnable, 0, 1, TimeUnit.SECONDS);
 		exec.scheduleAtFixedRate(redditShitpostRunnable, 2, 2, TimeUnit.HOURS);
-		exec.scheduleAtFixedRate(PewDiePieVsTGayRunnable, 60, 1, TimeUnit.SECONDS);
 	}
 
 	@EventSubscriber

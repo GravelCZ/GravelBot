@@ -4,15 +4,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Base64;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
+
 import cz.GravelCZLP.Bot.APIs.Imgur.ImgurAPI;
 import cz.GravelCZLP.Bot.APIs.MojangAPI.MojangAPI;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
+import cz.GravelCZLP.Bot.Main.Main;
 import cz.GravelCZLP.Bot.Utils.Logger;
 import cz.GravelCZLP.Bot.Utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
@@ -23,6 +29,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 public class MojangAPICommand implements ICommand {
 
+	private HashMap<String, Pair<Long, String>> c = new HashMap<>(); // uuid, last time, base64 png
+	
 	@Override
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
 		if (args.length == 0) {
@@ -56,7 +64,9 @@ public class MojangAPICommand implements ICommand {
 					sendMessage(channel, "Invalid username.");
 					return;
 				}
-				String[] response = MojangAPI.getPlayerNameHistory(resp[0]);
+				Pair<String[], Integer> rs = MojangAPI.getPlayerNameHistory(resp[0]);
+				
+				String[] response = rs.getKey();
 				StringBuffer names = new StringBuffer();
 				for (int i = 0; i < response.length; i++) {
 					if (i == response.length - 1) {
@@ -81,20 +91,45 @@ public class MojangAPICommand implements ICommand {
 					sendMessage(channel, "Invalid username");
 					return;
 				}
-				String url = MojangAPI.getSkinUrl(response[0]);
+				boolean ask = true;
+				if (c.containsKey(response[0])) {
+					Pair<Long, String> v = c.get(response[0]);
+					if ((System.currentTimeMillis() - v.getKey()) < 60 * 1000) {
+						ask = false;
+					}
+				}
+				Pair<String, Integer> url = null;
+				if (ask) {
+					url = MojangAPI.getSkinUrl(response[0]);
+					if (url.getValue() != 200) {
+						sendMessage(channel, "Got response code: " + url.getValue());
+						JSONObject obj = new JSONObject(url.getValue());
+						sendMessage(channel, obj.getString("TooManyRequestsException") + ": " + obj.getString("errorMessage"));
+						return;
+					}	
+				}
 				try {
-					Logger.debug("Skin URL: " + url);
-					byte[] data = Utils.downloadFile(new URL(url), new HashMap<>());
-					String sha = Utils.toB64(Utils.sha256(data));
+					Pair<byte[], Integer> dataResp = null;
+					if (ask) {
+						Logger.debug("Skin URL: " + url.getKey());
+						dataResp = Utils.downloadFile(new URL(url.getKey()), new HashMap<>());
+						
+						if (dataResp.getValue() != 200) {
+							sendMessage(channel, "Got response code: " + dataResp.getValue());
+							JSONObject obj = new JSONObject(dataResp.getValue());
+							sendMessage(channel, obj.getString("TooManyRequestsException") + ": " + obj.getString("errorMessage"));
+							return;
+						}	
+					}
 					
-					File folder = new File("./BotDataFolder/mcskins/");
-					if (!folder.exists()) {
-						folder.mkdirs();
+					byte[] data = new byte[0];
+					if (ask) {
+						data = dataResp.getKey();
+						c.put(response[0], Pair.of(System.currentTimeMillis(), Utils.toB64(data)));
+					} else {
+						data = Base64.getUrlDecoder().decode(c.get(response[0]).getValue());
 					}
-					File lookupFile = new File("./BotDataFolder/mcskins/playerSkins.txt");
-					if (!lookupFile.exists()) {
-						lookupFile.createNewFile();
-					}
+					String sha = Utils.toB64(Utils.sha256(data));
 					
 					if (args.length >= 3) {
 						if (args[2].equalsIgnoreCase("head2d")) {
@@ -111,31 +146,50 @@ public class MojangAPICommand implements ICommand {
 							sha = Utils.toB64(Utils.sha256(data));
 						}
 						if (args[2].equalsIgnoreCase("head3d")) {
-							data = Utils.downloadFile(new URL("https://crafatar.com/renders/head/" + response[0] + "?overlay"), new HashMap<>());
+							Pair<byte[], Integer> resp = Utils.downloadFile(new URL("https://crafatar.com/renders/head/" + response[0] + "?overlay"), new HashMap<>());
+							if ((int) (resp.getValue() / 100) != 2) {
+								sendMessage(channel, "Got response code: " + resp.getValue());
+								return;
+							}
+							
+							data = resp.getKey();
 							sha = Utils.toB64(Utils.sha256(data));
 						}
 						if (args[2].equalsIgnoreCase("skin3d")) {
-							data = Utils.downloadFile(new URL("https://crafatar.com/renders/body/" + response[0] + "?overlay"), new HashMap<>());
+							Pair<byte[], Integer> resp = Utils.downloadFile(new URL("https://crafatar.com/renders/body/" + response[0] + "?overlay"), new HashMap<>());
+							if ((int) (resp.getValue() / 100) != 2) {
+								sendMessage(channel, "Got response code: " + resp.getValue());
+								return;
+							}
+							data = resp.getKey(); 
 							sha = Utils.toB64(Utils.sha256(data));
 						}
 					}
 					
-					String[] lines = Utils.getLinesFromFile(lookupFile);
+					PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT url FROM playerSkins WHERE hash = ?;");
+					ps.setString(1, sha);
+					
+					ResultSet rs = ps.executeQuery();
+					
 					String urlSkin = "";
 					boolean upload = true;
-					for (int i = 0; i < lines.length; i++) {
-						String[] split = lines[i].split(";");
-						if (split[0].equalsIgnoreCase(sha)) {
-							urlSkin = split[1];
-							upload = false;
-							break;
-						}
+					
+					if (rs.next()) {
+						upload = false;
+						urlSkin = rs.getString("url");
 					}
+
 					if (upload) {
 						String[] resp = ImgurAPI.upload(data, response[0]);
 						urlSkin = resp[2];
-						String finalString = sha + ";" + resp[2] + ";" + resp[1] + ";" + resp[0] + ";" + resp[3];
-						Utils.appendToFile(lookupFile, finalString);
+						
+						PreparedStatement ps1 = Main.getDBManager().prepareStatement("INSERT INTO playerSkins(hash, url, deletehash, id, type) VALUES(?,?,?,?,?)");
+						ps1.setString(1, sha);
+						ps1.setString(2, resp[2]);
+						ps1.setString(3, resp[1]);
+						ps1.setString(4, resp[0]);
+						ps1.setString(5, resp[3]);
+						ps1.execute();
 					}
 					
 					EmbedBuilder b = new EmbedBuilder();
@@ -146,7 +200,7 @@ public class MojangAPICommand implements ICommand {
 					b.withTitle(response[1]);
 					b.withImage(urlSkin);
 					
-					b.withFooterText("GravelCZLP - Author; Bot writren in Java; API is Discord4J; v" + Utils.getVersion());
+					b.withFooterText("GravelCZLP - Author | Bot writren in Java | API is Discord4J | v" + Utils.getVersion());
 					b.withFooterIcon("https://i.imgur.com/MraElzj.png");
 					sendMessage(channel, b.build());
 				} catch (Exception e) {

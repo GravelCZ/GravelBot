@@ -114,7 +114,7 @@ public class RedditAPI implements IAPI {
 			headers.put("User-Agent", userAgent);
 			headers.put("Authorization", "bearer " + getToken());
 			
-			return Utils.makeUrlGetRequest(url, headers, false);	
+			return Utils.makeUrlGetRequest(url, headers, false).getKey();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,7 +135,7 @@ public class RedditAPI implements IAPI {
 			headers.put("Content-Length", String.valueOf(data.length()));
 			headers.put("Authorization", "Basic " + encodedLogin);
 			
-			String out = Utils.makeUrlPostRequest(new URL("https://www.reddit.com/api/v1/access_token"), headers, data);
+			String out = Utils.makeUrlPostRequest(new URL("https://www.reddit.com/api/v1/access_token"), headers, data).getKey();
 
 			JSONObject obj = new JSONObject(out);
 

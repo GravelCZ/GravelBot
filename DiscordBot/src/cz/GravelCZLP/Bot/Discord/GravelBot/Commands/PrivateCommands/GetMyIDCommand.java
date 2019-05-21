@@ -13,7 +13,6 @@ public class GetMyIDCommand implements ICommand {
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
 		RequestBuffer.request(() -> {
 			channel.sendMessage(String.valueOf(sender.getLongID()));
-			channel.sendMessage(sender.getStringID());
 		});
 	}
 

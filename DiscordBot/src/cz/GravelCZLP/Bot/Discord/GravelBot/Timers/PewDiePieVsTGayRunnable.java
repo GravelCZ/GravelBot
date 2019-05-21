@@ -158,7 +158,7 @@ public class PewDiePieVsTGayRunnable implements Runnable {
 	private int getSubscibers(String channel) {
 		try {
 			URL url = new URL(apiRequestUrl.replaceFirst("%CHID%", channel).replaceFirst("%KEY%", Constants.youtubeApiKey));
-			String response = Utils.makeUrlGetRequest(url, new HashMap<>(), false);
+			String response = Utils.makeUrlGetRequest(url, new HashMap<>(), false).getKey();
 			
 			JSONObject responseObject = new JSONObject(response);
 			JSONArray items = responseObject.getJSONArray("items");

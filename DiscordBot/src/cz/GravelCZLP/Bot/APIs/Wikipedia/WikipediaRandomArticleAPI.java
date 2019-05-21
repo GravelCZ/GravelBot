@@ -16,7 +16,7 @@ public class WikipediaRandomArticleAPI implements IAPI {
 	
 	public static String getRandomArticleUrl() {
 		try {
-			String returnedString = Utils.makeUrlGetRequest(new URL(randomArticleUrl), new HashMap<String, String>(), false);
+			String returnedString = Utils.makeUrlGetRequest(new URL(randomArticleUrl), new HashMap<String, String>(), false).getKey();
 			
 			JSONObject returnedObject = new JSONObject(returnedString);
 			
@@ -26,7 +26,7 @@ public class WikipediaRandomArticleAPI implements IAPI {
 			
 			int id = firstRandom.getInt("id");
 			
-			String queryObjectString = Utils.makeUrlGetRequest(new URL(pageIdToUrl.replaceAll("%ID%", String.valueOf(id))), new HashMap<String, String>(), false);
+			String queryObjectString = Utils.makeUrlGetRequest(new URL(pageIdToUrl.replaceAll("%ID%", String.valueOf(id))), new HashMap<String, String>(), false).getKey();
 			JSONObject urlQueryObject = new JSONObject(queryObjectString); 
 			JSONObject urlQuery = urlQueryObject.getJSONObject("query");
 			JSONObject pages = urlQuery.getJSONObject("pages");

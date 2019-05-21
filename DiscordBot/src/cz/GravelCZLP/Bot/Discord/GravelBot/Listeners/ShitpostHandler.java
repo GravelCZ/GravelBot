@@ -1,12 +1,11 @@
 package cz.GravelCZLP.Bot.Discord.GravelBot.Listeners;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.GravelCZLP.Bot.Main.Main;
 import cz.GravelCZLP.Bot.Utils.Logger;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -27,31 +26,25 @@ public class ShitpostHandler {
 	}
 	
 	public static void load() throws Exception {
-		File f = new File("./BotDataFolder/blockedGuilds.txt");
-		if (!f.exists()) {
-			f.createNewFile();
+		PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT * FROM blockedGuilds");
+		ResultSet rs = ps.executeQuery();
+		int size = 0;
+		while (rs.next()) {
+			size++;
+			blockedGuilds.add(rs.getString("guildName") + ":" + rs.getInt("guildId"));
 		}
-		BufferedReader br = new BufferedReader(new FileReader(f));
-		String line;
-		int loaded = 0;
-		while ((line = br.readLine()) != null) {
-			blockedGuilds.add(line);
-			loaded++;
-		}
-		br.close();
-		Logger.log("Shitpost blocked guilds loaded: " + loaded);
+		Logger.log("Shitpost blocked guilds loaded: " + size);
 	}
 	
 	public static void save() throws Exception {
-		File f = new File("./BotDataFolder/blockedGuilds.txt");
-		if (!f.exists()) {
-			f.createNewFile();
-		}
-		FileWriter fw = new FileWriter(f, false);
+		Main.getDBManager().execute("truncate table blockedGuilds;");
 		for (String s : blockedGuilds) {
-			fw.write(s + "\n");
+			String[] sp = s.split(":");
+			PreparedStatement ps = Main.getDBManager().prepareStatement("INSERT INTO blockedGuilds(guildName, guildId) VALUES(?,?);");
+			ps.setString(1, sp[0]);
+			ps.setInt(2, Integer.valueOf(sp[1]));
+			ps.execute();
 		}
-		fw.close();
 		Logger.log("Saved shitpost blocked Guilds.");
 	}
 }

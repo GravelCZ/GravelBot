@@ -8,10 +8,13 @@ import java.io.InputStreamReader;
 import cz.GravelCZLP.Bot.Discord.IDiscordBot;
 import cz.GravelCZLP.Bot.Discord.GravelBot.GravelBot;
 import cz.GravelCZLP.Bot.Discord.ProgramatoriBot.ProgramatoriBot;
+import cz.GravelCZLP.Bot.Utils.DatabaseManager;
 import cz.GravelCZLP.Bot.Utils.Logger;
 
 public class Main {
 
+	private static DatabaseManager dbman;
+	
 	private IDiscordBot gravelBot, progBot;
 
 	private static long start = 0;
@@ -27,6 +30,9 @@ public class Main {
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
+		dbman = new DatabaseManager();
+		dbman.init("192.168.1.7", 3306, Constants.mysqlUsername, Constants.mysqlPassword, "bot");
+		
 		Logger.log("Loading Discord Bot.");
 		
 		startDiscordBot();
@@ -66,6 +72,10 @@ public class Main {
 		}));
 	}
 
+	public static DatabaseManager getDBManager() {
+		return dbman;
+	}
+	
 	private void startProgramatoriBot() {
 		progBot = new ProgramatoriBot();
 		progBot.init(this);

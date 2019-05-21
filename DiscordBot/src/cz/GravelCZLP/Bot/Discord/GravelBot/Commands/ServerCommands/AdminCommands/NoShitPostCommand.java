@@ -13,14 +13,15 @@ public class NoShitPostCommand implements ICommand {
 	@Override
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
 		if (args.length < 1) {
-			sendMessage(channel, "shitpost [enable/disable]");
+			sendMessage(channel, "Usage: !/shitpost [enable/disable]");
+			return;
 		}
 		if (args[0].equalsIgnoreCase("enable")) {
-			ShitpostHandler.block(guild);
-			sendMessage(channel, "I have disabled shitpost features on this server.");
-		} else if (args[0].equalsIgnoreCase("disable")) {
 			ShitpostHandler.unblock(guild);
 			sendMessage(channel, "I have enabled shitpost features on this server.");
+		} else if (args[0].equalsIgnoreCase("disable")) {
+			ShitpostHandler.block(guild);
+			sendMessage(channel, "I have disabled shitpost features on this server.");
 		}
 	}
 

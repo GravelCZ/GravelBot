@@ -17,7 +17,7 @@ public class Rule34SearchAPI implements IAPI {
 		tags = tags.replaceAll(" ", "+");
 
 		try {
-			String rawXML = Utils.makeUrlGetRequest(new URL(queryUrl.replaceAll("%TAGS%", tags)), new HashMap<String, String>(), false);
+			String rawXML = Utils.makeUrlGetRequest(new URL(queryUrl.replaceAll("%TAGS%", tags)), new HashMap<String, String>(), false).getKey();
 			JSONObject obj = XML.toJSONObject(rawXML);
 			return obj.toString();
 		} catch (Exception e) {

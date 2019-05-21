@@ -3,13 +3,12 @@ package cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Base64;
 import java.util.Hashtable;
 
@@ -23,6 +22,7 @@ import org.json.JSONObject;
 import cz.GravelCZLP.Bot.APIs.Imgur.ImgurAPI;
 import cz.GravelCZLP.Bot.APIs.PasteBinAPI.PasteBinAPI;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
+import cz.GravelCZLP.Bot.Main.Main;
 import cz.GravelCZLP.Bot.Utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -184,36 +184,32 @@ public class McInfoCommand implements ICommand {
 
 					if (data != null) {
 						byte[] dataBytes = Base64.getDecoder().decode(data.getBytes("UTF-8"));
-						byte[] sha = Utils.sha256(dataBytes);
-
-						File folder = new File("./BotDataFolder/mcinfo/");
-						if (!folder.exists()) {
-							folder.mkdirs();
-						}
-						File lookupFile = new File("./BotDataFolder/mcinfo/favicons.txt");
-						if (!lookupFile.exists()) {
-							lookupFile.createNewFile();
-						}
+						String sha = Utils.toB64(Utils.sha256(dataBytes));
 						
-						ArrayList<String> lines = new ArrayList<>(Arrays.asList(Utils.getLinesFromFile(lookupFile)));
+						PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT faviconUrl FROM favicons WHERE sha = ?;");
+						ps.setString(1, sha);
 
+						ResultSet rs = ps.executeQuery();
+						
 						boolean upload = true;
-						for (String l : lines) {
-							String[] spli2t = l.split(";"); // format: sha of favicon;url;deletehash;id;type
-							if (spli2t[0].equals(Base64.getEncoder().encodeToString(sha))) {
-								upload = false;
-								image = spli2t[1];
-								break;
-							}
+						if (rs.next()) {
+							upload = false;
+							image = rs.getString("faviconUrl");
 						}
 
 						if (upload) {
 							String[] responses = ImgurAPI.upload(dataBytes,
 									descText.replaceAll("\n", "").replaceAll("\r", ""));
 							image = responses[2];
-							String finalString = Base64.getEncoder().encodeToString(sha) + ";" + responses[2] + ";"
-									+ responses[1] + ";" + responses[0] + ";" + responses[3];
-							Utils.appendToFile(lookupFile, finalString);
+							
+							PreparedStatement ps1 = Main.getDBManager().prepareStatement("INSERT INTO favicons(sha, faviconUrl, id, deleteHash, type) VALUES(?,?,?,?,?);");
+							ps1.setString(1, sha);
+							ps1.setString(2, responses[2]);
+							ps1.setString(3, responses[0]);
+							ps1.setString(4, responses[1]);
+							ps1.setString(5, responses[3]);
+							
+							ps1.execute();
 						}
 					}
 

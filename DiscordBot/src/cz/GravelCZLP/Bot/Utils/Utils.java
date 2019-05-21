@@ -22,6 +22,8 @@ import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public class Utils {
 
 	private static int questions = 0;
@@ -101,7 +103,7 @@ public class Utils {
 		}
 	}
 	
-	public static String makeUrlPostRequest(URL url, HashMap<String, String> headers, String data) {
+	public static Pair<String, Integer> makeUrlPostRequest(URL url, HashMap<String, String> headers, String data) {
 		try {
 			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
@@ -124,17 +126,25 @@ public class Utils {
 
 			if (conn.getResponseCode() == 404) {
 				Logger.error("URL: " + url.toString() + " not found(404)");
-				return null;
+				return Pair.of(null, 404);
 			}
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			InputStream is = null;
+			
+			try {
+				is = conn.getInputStream();
+			} catch (Exception e) {
+				is = conn.getErrorStream();
+			}
+			
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			String line;
 			StringBuffer buffer = new StringBuffer();
 			while ((line = br.readLine()) != null) {
 				buffer.append(line);
 			}
 
-			return buffer.toString();
+			return Pair.of(buffer.toString(), conn.getResponseCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,7 +171,7 @@ public class Utils {
 		return null;
 	}
 
-	public static String makeUrlGetRequest(URL url, HashMap<String, String> headers, boolean appendNewLine) {
+	public static Pair<String, Integer> makeUrlGetRequest(URL url, HashMap<String, String> headers, boolean appendNewLine) {
 		try {
 			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
@@ -179,10 +189,18 @@ public class Utils {
 				return null;
 			}
 
-			// Logger.debug("Method: GET to url: " + url.toString());
+			Logger.debug("Method: GET to url: " + url.toString());
 
+			InputStream is = null;
+			
+			try {
+				is = conn.getInputStream();
+			} catch (Exception e) {
+				is = conn.getErrorStream();
+			}
+			
 			StringBuffer sb = new StringBuffer();
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 			String line;
 
@@ -194,14 +212,14 @@ public class Utils {
 				}
 			}
 
-			return sb.toString();
+			return Pair.of(sb.toString(), conn.getResponseCode());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static InputStream getInputStreamFromURL(URL url, HashMap<String, String> headers) {
+	public static Pair<InputStream, Integer> getInputStreamFromURL(URL url, HashMap<String, String> headers) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
@@ -218,10 +236,10 @@ public class Utils {
 
 			if (conn.getResponseCode() == 404) {
 				Logger.error("URL: " + url.toString() + " not found(404)");
-				return null;
+				return Pair.of(null, 404);
 			}
 
-			return conn.getInputStream();
+			return Pair.of(conn.getInputStream(), conn.getResponseCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -276,7 +294,7 @@ public class Utils {
 		return null;
 	}
 	
-	public static byte[] downloadFile(URL url, HashMap<String, String> headers) {
+	public static Pair<byte[], Integer> downloadFile(URL url, HashMap<String, String> headers) {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
@@ -289,7 +307,7 @@ public class Utils {
 
 			if (conn.getResponseCode() == 404) {
 				Logger.error("URL: " + url.toString() + " not found(404)");
-				return new byte[0];
+				return Pair.of(new byte[0], 404);
 			}
 
 			InputStream is = new BufferedInputStream(conn.getInputStream());
@@ -305,7 +323,7 @@ public class Utils {
 			bos.close();
 			is.close();
 
-			return bos.toByteArray();
+			return Pair.of(bos.toByteArray(), conn.getResponseCode());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

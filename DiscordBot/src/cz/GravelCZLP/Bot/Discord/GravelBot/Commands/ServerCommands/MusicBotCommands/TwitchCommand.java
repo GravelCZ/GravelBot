@@ -82,7 +82,7 @@ public class TwitchCommand implements ICommand {
 			try {
 				guild.getAudioManager().setAudioProvider(new TwitchAudioProvider(name, guild));
 			} catch (Exception e) {
-				sendMessage(channel, "Internal error occured: " + e.getClass().getName() + ": " + e.getMessage().substring(0, e.getMessage().indexOf("https://")));
+				sendMessage(channel, "Internal error occured: " + e.getClass().getName() + ": " + e.getMessage());
 				e.printStackTrace();
 			}
 			GAudioProcessor p = (GAudioProcessor) guild.getAudioManager().getAudioProcessor();

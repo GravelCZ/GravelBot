@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 
 import cz.GravelCZLP.Bot.Main.Constants;
@@ -33,9 +34,13 @@ public class ImgurAPI {
 			finalData.append(title + "\r\n");
 			finalData.append(randomWebFormBound + "--");
 			
-			String response = Utils.makeUrlPostRequest(new URL("https://api.imgur.com/3/image?type=base64"), headers, Base64.getEncoder().encodeToString(base64imagedata));
+			Pair<String, Integer> response = Utils.makeUrlPostRequest(new URL("https://api.imgur.com/3/image?type=base64"), headers, Base64.getEncoder().encodeToString(base64imagedata));
 			
-			JSONObject obj = new JSONObject(response);
+			if (response.getValue() != 200) {
+				throw new Exception("Got response code: " + response.getValue());
+			}
+			
+			JSONObject obj = new JSONObject(response.getKey());
 			JSONObject dataObj = obj.getJSONObject("data");
 			String[] returnData = new String[5];
 			returnData[0] = dataObj.getString("id");

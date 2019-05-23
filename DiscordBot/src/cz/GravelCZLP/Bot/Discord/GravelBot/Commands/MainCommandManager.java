@@ -30,6 +30,7 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MusicBotComma
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MusicBotCommands.StopCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MusicBotCommands.TwitchCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MusicBotCommands.VolumeCommand;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.MusicBotCommands.YoutubeCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.QuestionAnswer.AnswerCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.QuestionAnswer.QAHandler;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.QuestionAnswer.QuestionCommand;
@@ -92,6 +93,7 @@ public class MainCommandManager {
 		serverCommands.put("stop", new StopCommand());
 		serverCommands.put("volume", new VolumeCommand());
 		serverCommands.put("twitch", new TwitchCommand());
+		serverCommands.put("youtube", new YoutubeCommand());
 	}
 	
 }

@@ -17,7 +17,7 @@ public class JoinCommand implements ICommand {
 		if (sender.getVoiceStates().size() == 0) {
 			sendMessage(channel, "You are not in a voice channel -_-");
 		} else {
-			IVoiceChannel voice = sender.getVoiceStates().get(guild.getLongID()).getChannel();
+			IVoiceChannel voice = sender.getVoiceStateForGuild(guild).getChannel();
 			if (voice == null) {
 				sendMessage(channel, "You are not in a voice channel -_-");
 				return;

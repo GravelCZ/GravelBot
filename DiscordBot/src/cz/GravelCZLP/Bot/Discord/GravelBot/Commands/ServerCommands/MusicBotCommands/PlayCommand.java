@@ -12,6 +12,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class PlayCommand implements ICommand {
 
@@ -23,6 +24,19 @@ public class PlayCommand implements ICommand {
 				((IPlayerProvider) provider).close();
 			}
 		}
+		if (guild.getClient().getOurUser().getVoiceStateForGuild(guild) == null) {
+			if (sender.getVoiceStateForGuild(guild) == null) {
+				sendMessage(channel, "You are not in a voice channel.");
+				return;
+			} else {
+				IVoiceChannel voice = sender.getVoiceStateForGuild(guild).getChannel();
+				requestVoid(() -> {
+					voice.join();
+				});
+				sendMessage(channel, ":white_check_mark: Connected to: **" + voice.getName() + "**.");
+			}
+		}
+	
 		if (args.length == 0) {
 			try {
 				guild.getAudioManager().setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));

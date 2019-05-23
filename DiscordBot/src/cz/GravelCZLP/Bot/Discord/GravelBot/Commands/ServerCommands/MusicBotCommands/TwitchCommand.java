@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import cz.GravelCZLP.Bot.APIs.Twitch.TwitchAPI;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.GAudioProcessor;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders.IPlayerProvider;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders.TwitchAudioProvider;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.PermissionsService;
@@ -40,12 +41,26 @@ public class TwitchCommand implements ICommand {
 			b.withFooterText("GravelCZLP - Author; Bot writren in Java; API is Discord4J");
 			b.withFooterIcon("https://i.imgur.com/MraElzj.png");
 			sendMessage(channel, b.build());
+			return;
 		}
 		if (args[0].equalsIgnoreCase("play")) {
 			if (args.length <= 1) {
 				sendMessage(channel, "Too few arguments. Use: **!/twitch play [channel name]**");
 				return;
 			}
+			if (guild.getClient().getOurUser().getVoiceStateForGuild(guild) == null) {
+				if (sender.getVoiceStateForGuild(guild) == null) {
+					sendMessage(channel, "You are not in a voice channel.");
+					return;
+				} else {
+					IVoiceChannel voice = sender.getVoiceStateForGuild(guild).getChannel();
+					requestVoid(() -> {
+						voice.join();
+					});
+					sendMessage(channel, ":white_check_mark: Connected to: **" + voice.getName() + "**.");
+				}
+			}
+			
 			String name = args[1];
 			String userInfo = TwitchAPI.getUserInfo(name);
 			JSONObject userInfoObj = new JSONObject(userInfo);
@@ -80,6 +95,9 @@ public class TwitchCommand implements ICommand {
 				}
 			}
 			try {
+				if (guild.getAudioManager().getAudioProvider() instanceof IPlayerProvider) {
+					((IPlayerProvider) guild.getAudioManager().getAudioProvider()).close();
+				}
 				guild.getAudioManager().setAudioProvider(new TwitchAudioProvider(name, guild));
 			} catch (Exception e) {
 				sendMessage(channel, "Internal error occured: " + e.getClass().getName() + ": " + e.getMessage());
@@ -118,7 +136,7 @@ public class TwitchCommand implements ICommand {
 			
 			b.withImage(previewObj.getString("large"));
 			
-			b.withFooterText("GravelCZLP - Author; Bot writren in Java; API is Discord4J");
+			b.withFooterText("GravelCZLP - Author | Bot writren in Java | API is Discord4J");
 			b.withFooterIcon("https://i.imgur.com/MraElzj.png");
 			
 			sendMessage(channel, b.build());

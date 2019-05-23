@@ -13,11 +13,11 @@ public class StopCommand implements ICommand {
 
 	@Override
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
-		sendMessage(channel, "Stopped playing (Stream Closed)");
 		IAudioProvider provider = guild.getAudioManager().getAudioProvider();
 		if (provider instanceof IPlayerProvider) {
 			((IPlayerProvider) provider).close();
 		}
+		sendMessage(channel, "Stopped playing (Stream Closed)");
 	}
 	
 	@Override

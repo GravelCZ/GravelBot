@@ -11,6 +11,7 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioFileFormat.Type;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
@@ -34,6 +35,10 @@ public class TwitchAudioProvider implements IAudioProvider, IPlayerProvider {
 	private Thread ffmpegThead;
 	
 	public TwitchAudioProvider(String twitchName, IGuild g) throws Exception {
+		Type[] tt = AudioSystem.getAudioFileTypes();
+		for (int i = 0; i < tt.length; i++) {
+			Logger.log(tt[i].getExtension());
+		}
 		twitchName = twitchName.toLowerCase();
 		
 		HashMap<String, String> headers = new HashMap<>();
@@ -53,7 +58,7 @@ public class TwitchAudioProvider implements IAudioProvider, IPlayerProvider {
 		 
 		Logger.debug("Twitch Reply: " + out.getKey());
 		
-		JSONObject obj = new JSONObject(out);
+		JSONObject obj = new JSONObject(out.getKey());
 		
 		String token = obj.getString("token");
 		String sig = obj.getString("sig");
@@ -97,7 +102,7 @@ public class TwitchAudioProvider implements IAudioProvider, IPlayerProvider {
 					BufferedReader br = new BufferedReader(new InputStreamReader(ffmpeg.getErrorStream()));
 					String line;
 					while ((line = br.readLine()) != null) {
-						Logger.debug("[FFMPEG]: " + line);
+						Logger.log("[FFMPEG]: " + line);
 					}	
 					int code = ffmpeg.waitFor();
 					Logger.log("FFMPEG exit code: " + code);

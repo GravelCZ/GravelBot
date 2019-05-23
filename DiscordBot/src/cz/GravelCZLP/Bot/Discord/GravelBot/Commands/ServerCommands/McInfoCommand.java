@@ -40,7 +40,7 @@ public class McInfoCommand implements ICommand {
 		}
 		Runnable r = new Runnable() {
 
-			@SuppressWarnings("unused")
+			
 			@Override
 			public void run() {
 				try {
@@ -85,21 +85,22 @@ public class McInfoCommand implements ICommand {
 					ByteArrayOutputStream bos = new ByteArrayOutputStream();
 					DataOutputStream handshake = new DataOutputStream(bos);
 
-					handshake.writeByte(0x00);
-					writeVarInt(handshake, 404);
-					writeVarInt(handshake, address.getHostString().length());
-					handshake.writeBytes(address.getHostString());
-					handshake.writeShort(address.getPort());
-					writeVarInt(handshake, 1);
+					handshake.writeByte(0x00); // packet id
+					writeVarInt(handshake, 404); // client version protocol
+					writeVarInt(handshake, address.getHostString().length()); // length server address 
+					handshake.writeBytes(address.getHostString()); // server address
+					handshake.writeShort(address.getPort()); // the port
+					writeVarInt(handshake, 1); // next state
 
-					writeVarInt(dos, bos.size());
-					dos.write(bos.toByteArray());
+					writeVarInt(dos, bos.size()); // write the size of the packet
+					dos.write(bos.toByteArray()); // send the packet
 
-					dos.writeByte(0x01);
-					dos.writeByte(0x00);
+					dos.writeByte(0x01); // ping packet, has no fields
+					dos.writeByte(0x00); // request packet, the server needs the ping first for whatever reason
 
-					int size = readVarInt(dis);
-					int id = readVarInt(dis);
+					readVarInt(dis); // read the size of the response packet, you need to call this
+					//even if you dont need the size at all because you need to read the packets the same way they were written
+					int id = readVarInt(dis); // read the packet id, we expect 0x00
 
 					if (id == -1) {
 						s.close();
@@ -110,7 +111,7 @@ public class McInfoCommand implements ICommand {
 						throw new IOException("Invalid packet id.");
 					}
 
-					int len = readVarInt(dis);
+					int len = readVarInt(dis); // read the length of the json object in the packet
 					if (len == -1) {
 						s.close();
 						throw new IOException("Premature end of stream.");
@@ -121,7 +122,7 @@ public class McInfoCommand implements ICommand {
 					}
 					byte[] in = new byte[len];
 
-					dis.readFully(in);
+					dis.readFully(in); // read the json object
 
 					s.close();
 

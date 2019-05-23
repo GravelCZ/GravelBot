@@ -33,9 +33,20 @@ public class LoveCalculatorCommand implements ICommand {
 			
 			long id1 = Long.valueOf(m1.group());
 			long id2 = Long.valueOf(m2.group());
+			
 			IUser user1 = guild.getUserByID(id1);
-			IUser user2 = guild.getUserByID(id2);			
-			String input = user1.getDisplayName(guild) + ":" + user1.getStringID() + "+" + user2.getDisplayName(guild) + ":" + user2.getStringID();
+			IUser user2 = guild.getUserByID(id2);
+			
+			String user1String = user1.getDisplayName(guild) + ":" + user1.getStringID();
+			String user2String = user2.getDisplayName(guild) + ":" + user2.getStringID();
+			
+			String input = "";
+			if (user1String.hashCode() > user2String.hashCode()) {
+				input = user1String + "+" + user2String;
+			} else {
+				input = user2String + "+" + user1String;
+			}
+			
 			int output = Utils.gravelHash(input);
 			
 			Random r = new Random(output);

@@ -10,6 +10,7 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.GAudioProcessor;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders.HttpAudioProvider;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders.IPlayerProvider;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Events.TwitchStreamEndEvent;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Events.YoutubeVideoEndEvent;
 import cz.GravelCZLP.Bot.Main.Constants;
 import cz.GravelCZLP.Bot.Utils.Logger;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -173,6 +174,18 @@ public class GuildStuffListener {
 		}
 	}
 
+	@EventSubscriber
+	public void onYoutubeVideoEnd(YoutubeVideoEndEvent e) {
+		try {
+			IAudioManager mng = e.getGuild().getAudioManager();
+			GAudioProcessor p = (GAudioProcessor) mng.getAudioProcessor();
+			p.getAudioProcessor().setVolume(0.05);
+			mng.setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
 	@EventSubscriber
 	public void onGuildCreate(GuildCreateEvent e) {
 		IAudioManager mng = e.getGuild().getAudioManager();

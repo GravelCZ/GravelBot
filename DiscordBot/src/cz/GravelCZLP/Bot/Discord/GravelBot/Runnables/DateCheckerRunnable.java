@@ -1,4 +1,4 @@
-package cz.GravelCZLP.Bot.Discord.GravelBot.Timers;
+package cz.GravelCZLP.Bot.Discord.GravelBot.Runnables;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import cz.GravelCZLP.Bot.Main.Constants;
-import cz.GravelCZLP.Bot.Utils.RequestResponse;
+import cz.GravelCZLP.Bot.Utils.RequestWithParameters;
 import cz.GravelCZLP.Bot.Utils.Logger;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
@@ -45,7 +45,7 @@ public class DateCheckerRunnable implements Runnable {
 					if (c.getModifiedPermissions(g.getClient().getOurUser()).contains(Permissions.MENTION_EVERYONE)) {
 						suffix = " " + g.getEveryoneRole().mention() + " !!!";
 					}
-					RequestBuffer.request(new RequestResponse<IMessage, String>(suffix) {
+					RequestBuffer.request(new RequestWithParameters<IMessage, String>(suffix) {
 
 						@Override
 						public IMessage request() {
@@ -74,7 +74,7 @@ public class DateCheckerRunnable implements Runnable {
 								if (c.getModifiedPermissions(g.getClient().getOurUser()).contains(Permissions.MENTION_EVERYONE)) {
 									suffix = " " + g.getEveryoneRole().mention() + " !!!";
 								}
-								RequestBuffer.request(new RequestResponse<IMessage, String>(suffix) {
+								RequestBuffer.request(new RequestWithParameters<IMessage, String>(suffix) {
 
 									@Override
 									public IMessage request() {
@@ -135,14 +135,14 @@ public class DateCheckerRunnable implements Runnable {
 									if (c.getModifiedPermissions(g.getClient().getOurUser()).contains(Permissions.MENTION_EVERYONE)) {
 										prefix = g.getEveryoneRole().mention();
 									}
-									RequestBuffer.request(new RequestResponse<IMessage, String>(prefix) {
+									RequestBuffer.request(new RequestWithParameters<IMessage, String>(prefix) {
 
 										@Override
 										public IMessage request() {
 											return channel.get().sendMessage(this.s + " it is Gravel´s birthday today. Lets wish him a happy birthday.");
 										}
 									});
-									RequestBuffer.request(new RequestResponse<IMessage, String>(gr.mention()) {
+									RequestBuffer.request(new RequestWithParameters<IMessage, String>(gr.mention()) {
 
 										@Override
 										public IMessage request() {
@@ -193,14 +193,14 @@ public class DateCheckerRunnable implements Runnable {
 									if (c.getModifiedPermissions(g.getClient().getOurUser()).contains(Permissions.MENTION_EVERYONE)) {
 										prefix = g.getEveryoneRole().mention();
 									}
-									RequestBuffer.request(new RequestResponse<IMessage, String>(prefix) {
+									RequestBuffer.request(new RequestWithParameters<IMessage, String>(prefix) {
 
 										@Override
 										public IMessage request() {
 											return channel.get().sendMessage(this.s + " it is Mat628CZ´s birthday today. Lets wish him a happy birthday.");
 										}
 									});
-									RequestBuffer.request(new RequestResponse<IMessage, String>(gr.mention()) {
+									RequestBuffer.request(new RequestWithParameters<IMessage, String>(gr.mention()) {
 
 										@Override
 										public IMessage request() {

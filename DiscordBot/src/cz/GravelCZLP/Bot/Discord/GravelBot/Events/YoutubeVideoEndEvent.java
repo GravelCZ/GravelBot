@@ -6,19 +6,13 @@ import sx.blah.discord.handle.obj.IGuild;
 public class YoutubeVideoEndEvent extends Event {
 	
 	private IGuild g;
-	private int code;
 	
-	public YoutubeVideoEndEvent(IGuild g, int code) {
+	public YoutubeVideoEndEvent(IGuild g) {
 		this.g = g;
-		this.code = code;
 	}
 
 	public IGuild getGuild() {
 		return g;
-	}
-
-	public int getCode() {
-		return code;
 	}
 
 }

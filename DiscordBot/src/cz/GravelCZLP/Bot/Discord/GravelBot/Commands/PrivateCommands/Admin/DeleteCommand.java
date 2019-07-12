@@ -26,11 +26,11 @@ public class DeleteCommand implements ICommand {
 		}
 		try {
 			if (args[0].equalsIgnoreCase("skins")) {
-				ResultSet rs = Main.getDBManager().executeQuery("SELECT hash,deleteHash FROM playerSkins;");
+				ResultSet rs = Main.getDBManager().getSource().getConnection().prepareStatement("SELECT hash,deleteHash FROM playerSkins;").executeQuery();
 				while (rs.next()) {
 					String deleteHash = rs.getString("deleteHash");
 					ImgurAPI.delete(deleteHash);
-					PreparedStatement ps = Main.getDBManager().prepareStatement("DELETE FROM playerSkins WHERE hash = ?");
+					PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("DELETE FROM playerSkins WHERE hash = ?");
 					ps.setString(1, rs.getString("hash"));
 					ps.execute();
 				}
@@ -39,11 +39,11 @@ public class DeleteCommand implements ICommand {
 				List<File> files = new ArrayList<>( Arrays.asList(pfpFolder.listFiles()));
 				files.forEach(f -> f.delete());
 			} else if (args[0].equalsIgnoreCase("favs")) {
-				ResultSet rs = Main.getDBManager().executeQuery("SELECT sha,deleteHash FROM favicons;");
+				ResultSet rs = Main.getDBManager().getSource().getConnection().prepareStatement("SELECT sha,deleteHash FROM favicons;").executeQuery();
 				while (rs.next()) {
 					String deleteHash = rs.getString("deleteHash");
 					ImgurAPI.delete(deleteHash);
-					PreparedStatement ps = Main.getDBManager().prepareStatement("DELETE FROM favicons WHERE sha = ?");
+					PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("DELETE FROM favicons WHERE sha = ?");
 					ps.setString(1, rs.getString("sha"));
 					ps.execute();
 				}

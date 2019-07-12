@@ -1,7 +1,7 @@
 package cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.PewDiePieVsTGayRunnable;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Runnables.PewDiePieVsTGayRunnable;
 import cz.GravelCZLP.Bot.Utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;

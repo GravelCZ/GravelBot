@@ -73,7 +73,7 @@ public class YoutubeCommand implements ICommand {
 			if (mat.find()) { // is a url
 				url = mat.group();
 				id = mat.group(1);
-			} else if (mat2.find()) {
+			} else if (mat2.find()) { // playlist
 				url = mat2.group();
 				id = mat2.group(1);
 				playlist = true;
@@ -89,6 +89,7 @@ public class YoutubeCommand implements ICommand {
 						return;
 					} else {
 						url = "https://www.youtube.com/watch?v=" + resp.getKey().get();
+						id = resp.getKey().get();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

@@ -304,12 +304,14 @@ public class Utils {
 			for (Entry<String, String> e : headers.entrySet()) {
 				conn.addRequestProperty(e.getKey(), e.getValue());
 			}
-
+			
+			Logger.log("GET to: " + url.toString());
+			
 			if (conn.getResponseCode() == 404) {
 				Logger.error("URL: " + url.toString() + " not found(404)");
 				return Pair.of(new byte[0], 404);
 			}
-
+			
 			InputStream is = new BufferedInputStream(conn.getInputStream());
 
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();

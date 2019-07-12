@@ -16,8 +16,8 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Audio.AudioProviders.HttpAudioProvide
 import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.ChatCommandListener;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.GuildStuffListener;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Listeners.ShitpostHandler;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.DateCheckerRunnable;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Timers.RedditShitpostRunnable;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Runnables.DateCheckerRunnable;
+import cz.GravelCZLP.Bot.Discord.GravelBot.Runnables.RedditShitpostRunnable;
 import cz.GravelCZLP.Bot.Main.Constants;
 import cz.GravelCZLP.Bot.Main.Main;
 import sx.blah.discord.api.ClientBuilder;
@@ -87,7 +87,7 @@ public class GravelBot implements IDiscordBot {
 			}
 			if (successfull) {
 				try {
-					g.getAudioManager().setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+					g.getAudioManager().setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
 				}	

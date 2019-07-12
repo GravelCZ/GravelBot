@@ -1,4 +1,4 @@
-package cz.GravelCZLP.Bot.Discord.GravelBot.Timers;
+package cz.GravelCZLP.Bot.Discord.GravelBot.Runnables;
 
 import java.util.ArrayList;
 import java.util.List;

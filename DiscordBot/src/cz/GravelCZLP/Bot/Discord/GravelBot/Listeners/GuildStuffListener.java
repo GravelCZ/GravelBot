@@ -108,7 +108,7 @@ public class GuildStuffListener {
 				try {
 					GAudioProcessor p = (GAudioProcessor) manager.getAudioProcessor();
 					p.getAudioProcessor().setVolume(0.05d);
-					manager.setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+					manager.setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
 				}
@@ -151,7 +151,7 @@ public class GuildStuffListener {
 				try {
 					GAudioProcessor p = (GAudioProcessor) manager.getAudioProcessor();
 					p.getAudioProcessor().setVolume(0.05d);
-					manager.setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+					manager.setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 				} catch (MalformedURLException e1) {
 					e1.printStackTrace();
 				}
@@ -168,7 +168,7 @@ public class GuildStuffListener {
 			IAudioManager mng = e.getGuild().getAudioManager();
 			GAudioProcessor p = (GAudioProcessor) mng.getAudioProcessor();
 			p.getAudioProcessor().setVolume(0.05);
-			mng.setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+			mng.setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -180,7 +180,7 @@ public class GuildStuffListener {
 			IAudioManager mng = e.getGuild().getAudioManager();
 			GAudioProcessor p = (GAudioProcessor) mng.getAudioProcessor();
 			p.getAudioProcessor().setVolume(0.05);
-			mng.setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+			mng.setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}

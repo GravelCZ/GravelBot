@@ -31,7 +31,7 @@ public class Main {
 			e1.printStackTrace();
 		}
 		dbman = new DatabaseManager();
-		dbman.init("192.168.1.7", 3306, Constants.mysqlUsername, Constants.mysqlPassword, "bot");
+		dbman.start("10.0.0.7", 3306, Constants.mysqlUsername, Constants.mysqlPassword, "bot");
 		
 		Logger.log("Loading Discord Bot.");
 		

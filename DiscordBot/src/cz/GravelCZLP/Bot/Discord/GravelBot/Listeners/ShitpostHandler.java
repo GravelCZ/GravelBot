@@ -26,7 +26,7 @@ public class ShitpostHandler {
 	}
 	
 	public static void load() throws Exception {
-		PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT * FROM blockedGuilds");
+		PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("SELECT * FROM blockedGuilds");
 		ResultSet rs = ps.executeQuery();
 		int size = 0;
 		while (rs.next()) {
@@ -37,10 +37,10 @@ public class ShitpostHandler {
 	}
 	
 	public static void save() throws Exception {
-		Main.getDBManager().execute("truncate table blockedGuilds;");
+		Main.getDBManager().getSource().getConnection().createStatement().execute("truncate table blockedGuilds;");
 		for (String s : blockedGuilds) {
 			String[] sp = s.split(":");
-			PreparedStatement ps = Main.getDBManager().prepareStatement("INSERT INTO blockedGuilds(guildName, guildId) VALUES(?,?);");
+			PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("INSERT INTO blockedGuilds(guildName, guildId) VALUES(?,?);");
 			ps.setString(1, sp[0]);
 			ps.setInt(2, Integer.valueOf(sp[1]));
 			ps.execute();

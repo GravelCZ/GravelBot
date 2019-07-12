@@ -25,8 +25,11 @@ public class YoutubeAudioProvider implements IPlayerProvider, IAudioProvider {
 	private Process ffmpeg, youtubedl;
 	private Thread ytToFfmpeg, ffmpegLogT; 
 	
+	private IGuild g;
+	
 	public YoutubeAudioProvider(String url, IGuild g) throws IOException, UnsupportedAudioFileException {
-		Logger.log(url);
+		Logger.log("URL To Request: " + url);
+		this.g = g;
 		youtubedl = Runtime.getRuntime().exec("youtube-dl -f 251 " + url + " -o -");
 		InputStream ytLogIn = youtubedl.getErrorStream();
 		InputStream ytData = youtubedl.getInputStream();
@@ -67,7 +70,6 @@ public class YoutubeAudioProvider implements IPlayerProvider, IAudioProvider {
 					}
 					int code = ffmpeg.waitFor();
 					Logger.log("FFMPEG exit code: " + code);
-					g.getClient().getDispatcher().dispatch(new YoutubeVideoEndEvent(g, code));
 				} catch (Exception e) {}
 			}
 		};
@@ -134,6 +136,7 @@ public class YoutubeAudioProvider implements IPlayerProvider, IAudioProvider {
 				return audio;
 			} else {
 				close();
+				g.getClient().getDispatcher().dispatch(new YoutubeVideoEndEvent(g));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

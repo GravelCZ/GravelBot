@@ -166,7 +166,7 @@ public class MojangAPICommand implements ICommand {
 						}
 					}
 					
-					PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT url FROM playerSkins WHERE hash = ?;");
+					PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("SELECT url FROM playerSkins WHERE hash = ?;");
 					ps.setString(1, sha);
 					
 					ResultSet rs = ps.executeQuery();
@@ -183,7 +183,7 @@ public class MojangAPICommand implements ICommand {
 						String[] resp = ImgurAPI.upload(data, response[0]);
 						urlSkin = resp[2];
 						
-						PreparedStatement ps1 = Main.getDBManager().prepareStatement("INSERT INTO playerSkins(hash, url, deletehash, id, type) VALUES(?,?,?,?,?)");
+						PreparedStatement ps1 = Main.getDBManager().getSource().getConnection().prepareStatement("INSERT INTO playerSkins(hash, url, deletehash, id, type) VALUES(?,?,?,?,?)");
 						ps1.setString(1, sha);
 						ps1.setString(2, resp[2]);
 						ps1.setString(3, resp[1]);

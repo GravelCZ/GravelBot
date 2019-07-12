@@ -2,6 +2,7 @@ package cz.GravelCZLP.Bot.Discord.ProgramatoriBot.Listeners;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,28 +40,6 @@ public class ProgListener {
 		String alias = params[0].replaceFirst(Constants.commandPrefixpBot, "");
 		String[] args = Arrays.copyOfRange(params, 1, params.length);
 
-		/*if (c.isPrivate()) {
-			if (!content.equals("test")) {
-				return;
-			}
-			Optional<IGuild> og = e.getClient().getGuilds().stream().filter(gu -> gu.getName().contains("Programátoři")).findFirst();
-			if (!og.isPresent()) {
-				return;
-			}
-			IGuild gu = og.get();
-			List<IRole> roles = gu.getRolesForUser(e.getClient().getOurUser());
-			Optional<IRole> or = roles.stream().filter(role -> role.getName().contains("Bot")).findFirst();
-			if (!or.isPresent()) {
-				return;
-			}
-			IRole role = or.get();
-			StringBuffer sb = new StringBuffer();
-			for (Permissions p : role.getPermissions()) {
-				sb.append(p.name() + " ");
-			}
-			c.sendMessage(sb.toString());
-			return;
-		}*/
 		if (!content.startsWith(Constants.commandPrefixpBot)) {
 			return;
 		}
@@ -68,46 +47,41 @@ public class ProgListener {
 			public void run() {
 				if (content.startsWith(Constants.commandPrefixpBot)) {
 					boolean notSet = bot.getChannelNameAndID() == null;
-					String[] split = new String[] { "test", "test" };
+					String[] split = null;
 					if (!notSet) {
 						split = bot.getChannelNameAndID().split(",");
 					}
-					if ((c.getName().equalsIgnoreCase(split[0]) && c.getStringID().equals(split[1])) || notSet) {
+					if (!notSet || (c.getName().equalsIgnoreCase(split[0]) && c.getStringID().equals(split[1]))) {
 						if (alias.equalsIgnoreCase("addlang")) {
 							if (args.length == 0) {
-								sendMessage(c, user.mention()
-										+ "Musíš mi říct jaké jazyky ti mám přidělit, postupně nebo je odděl pomocí \";\" dám ti ty role, které budu moct.");
+								sendMessage(c, user.mention() + "Musíš mi říct jaké jazyky ti mám přidělit, postupně nebo je odděl pomocí \";\" dám ti ty role, které budu moct.");
 								return;
 							}
 							if (args[0].contains(";")) {
-								String[] split2 = args[0].split(";");
 								StringBuffer b = new StringBuffer();
 								b.append(user.mention() + "\n");
-								boolean givenRoles = false;
-								for (int i = 0; i < split2.length; i++) {
-									String role = split2[i];
-									List<IRole> roles = g.getRoles().stream()
-											.filter(r -> r.getName().equalsIgnoreCase(role))
-											.collect(Collectors.toList());
-									if (roles.isEmpty()) {
-										sendMessage(c, user.mention() + " žádné z rolí které jsi mi dal neexistují.");
+								
+								List<String> rolesFound = Collections.emptyList();
+								Arrays.asList(args[0].split(";")).stream().forEach(role -> {
+									rolesFound.add(role.toLowerCase());
+								});
+								List<IRole> roles = g.getRoles().stream().filter(r -> rolesFound.contains(r.getName().toLowerCase())).collect(Collectors.toList());
+								
+								if (roles.isEmpty()) {
+									sendMessage(c, user.mention() + " žádné z rolí které jsi mi dal neexistují.");
+									return;
+								}
+								
+								roles.forEach(role -> {
+									if (isAdminRole(role)) {
+										sendMessage(c, user.mention() + " tak takhle blbej fakt nejsem :D admina ti dávat nebudu.");
 										return;
-									} else {
-										for (IRole ro : roles) {
-											if (isAdminRole(ro)) {
-												sendMessage(c, user.mention()
-														+ " tak takhle blbej fakt nejsem :D admina ti dávat nebudu.");
-												return;
-											}
-											user.addRole(ro);
-											givenRoles = true;
-											b.append("Dal jsem ti roli: " + ro.getName() + "\n");
-										}
 									}
-								}
-								if (givenRoles) {
-									sendMessage(c, b.toString());
-								}
+									user.addRole(role);
+									b.append("Dal jsem ti roli: " + role.getName() + "\n");
+								});
+								
+								sendMessage(c, b.toString());
 							} else {
 								Optional<IRole> roleop = g.getRoles().stream()
 										.filter(r -> r.getName().equalsIgnoreCase(args[0])).findFirst();
@@ -119,8 +93,7 @@ public class ProgListener {
 									user.addRole(roleop.get());
 									sendMessage(c, user.mention() + " Dal jsem ti roli: " + roleop.get().getName());
 								} else {
-									sendMessage(c, user.mention()
-											+ " Tato role/programovací jazyk neexistuje. Pokud ano, kontaktuj adminy aby jej přidali.");
+									sendMessage(c, user.mention() + " Tato role/programovací jazyk neexistuje. Pokud ano, kontaktuj adminy aby jej přidali.");
 								}
 							}
 						} else if (alias.equalsIgnoreCase("remlang")) {

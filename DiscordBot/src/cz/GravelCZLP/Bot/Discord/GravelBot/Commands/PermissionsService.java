@@ -11,7 +11,7 @@ import sx.blah.discord.handle.obj.IUser;
 
 public class PermissionsService {
 
-	private static List<String> admins = new ArrayList<>(Arrays.asList("GravelCZLP;331866918023725056"));
+	private static List<String> admins = new ArrayList<>(Arrays.asList("GravelCZ;331866918023725056"));
 	private static List<String> roles = new ArrayList<>(Arrays.asList("Admin"));
 	private static String botRoleName = "GravelBot";
 

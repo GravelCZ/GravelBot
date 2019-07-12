@@ -7,7 +7,7 @@ import com.vdurmont.emoji.EmojiManager;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
 import cz.GravelCZLP.Bot.Utils.Logger;
-import cz.GravelCZLP.Bot.Utils.RequestResponse;
+import cz.GravelCZLP.Bot.Utils.RequestWithParameters;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -59,7 +59,7 @@ public class ReactOOFCommand implements ICommand {
 			IMessage chMessageFetch = null;
 
 			if (chIMessage == null) {
-				RequestFuture<IMessage> msgFuture = RequestBuffer.request(new RequestResponse<IMessage, Long>(i) {
+				RequestFuture<IMessage> msgFuture = RequestBuffer.request(new RequestWithParameters<IMessage, Long>(i) {
 
 					@Override
 					public IMessage request() {

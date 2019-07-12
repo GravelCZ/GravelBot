@@ -19,7 +19,6 @@ import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.RandomWikiped
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.ReactOOFCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.ServerHelpCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.UptimeCommand;
-import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.WynncraftAPICommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.AdminCommands.DeleteAllCommandServer;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.AdminCommands.LeaveGuildCommand;
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ServerCommands.AdminCommands.NoShitPostCommand;
@@ -70,7 +69,6 @@ public class MainCommandManager {
 		serverCommands.put("about", new AboutCommand());
 		//serverCommands.put("theytwar", new TheYTWarCommand());
 		serverCommands.put("mcinfo", new McInfoCommand());
-		serverCommands.put("wynncraftapi", new WynncraftAPICommand());
 		serverCommands.put("mojangapi", new MojangAPICommand());
 		serverCommands.put("lovecalculator", new LoveCalculatorCommand());
 		serverCommands.put("uptime", new UptimeCommand());

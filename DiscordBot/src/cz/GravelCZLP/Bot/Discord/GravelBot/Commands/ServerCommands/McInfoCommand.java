@@ -187,7 +187,7 @@ public class McInfoCommand implements ICommand {
 						byte[] dataBytes = Base64.getDecoder().decode(data.getBytes("UTF-8"));
 						String sha = Utils.toB64(Utils.sha256(dataBytes));
 						
-						PreparedStatement ps = Main.getDBManager().prepareStatement("SELECT faviconUrl FROM favicons WHERE sha = ?;");
+						PreparedStatement ps = Main.getDBManager().getSource().getConnection().prepareStatement("SELECT faviconUrl FROM favicons WHERE sha = ?;");
 						ps.setString(1, sha);
 
 						ResultSet rs = ps.executeQuery();
@@ -203,7 +203,7 @@ public class McInfoCommand implements ICommand {
 									descText.replaceAll("\n", "").replaceAll("\r", ""));
 							image = responses[2];
 							
-							PreparedStatement ps1 = Main.getDBManager().prepareStatement("INSERT INTO favicons(sha, faviconUrl, id, deleteHash, type) VALUES(?,?,?,?,?);");
+							PreparedStatement ps1 = Main.getDBManager().getSource().getConnection().prepareStatement("INSERT INTO favicons(sha, faviconUrl, id, deleteHash, type) VALUES(?,?,?,?,?);");
 							ps1.setString(1, sha);
 							ps1.setString(2, responses[2]);
 							ps1.setString(3, responses[0]);

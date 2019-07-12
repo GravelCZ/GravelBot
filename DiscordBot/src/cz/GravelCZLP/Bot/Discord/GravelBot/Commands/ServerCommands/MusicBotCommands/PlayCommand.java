@@ -15,7 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.IVoiceChannel;
 
 public class PlayCommand implements ICommand {
-
+	
 	@Override
 	public void execute(IMessage msg, IChannel channel, IUser sender, IGuild guild, String content, String[] args) {
 		IAudioProvider provider = guild.getAudioManager().getAudioProvider();
@@ -39,7 +39,7 @@ public class PlayCommand implements ICommand {
 	
 		if (args.length == 0) {
 			try {
-				guild.getAudioManager().setAudioProvider(new HttpAudioProvider(new URL("http://192.168.1.7:8080/")));
+				guild.getAudioManager().setAudioProvider(new HttpAudioProvider(new URL("http://10.0.0.7:8080/")));
 			} catch (Exception e1) {
 				channel.sendMessage(e1.getMessage());
 				e1.printStackTrace();

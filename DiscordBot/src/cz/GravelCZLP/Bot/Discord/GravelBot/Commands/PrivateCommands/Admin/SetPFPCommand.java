@@ -12,7 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import cz.GravelCZLP.Bot.Discord.GravelBot.Commands.ICommand;
 import cz.GravelCZLP.Bot.Utils.Logger;
-import cz.GravelCZLP.Bot.Utils.RequestResponse;
+import cz.GravelCZLP.Bot.Utils.RequestWithParameters;
 import cz.GravelCZLP.Bot.Utils.Utils;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -64,7 +64,7 @@ public class SetPFPCommand implements ICommand {
 				}	
 				IUser user = msg.getClient().getUserByID(id);
 				if (user == null) {
-					RequestFuture<IUser> userFuture = RequestBuffer.request(new RequestResponse<IUser, Long>(id) {
+					RequestFuture<IUser> userFuture = RequestBuffer.request(new RequestWithParameters<IUser, Long>(id) {
 						
 						@Override
 						public IUser request() {

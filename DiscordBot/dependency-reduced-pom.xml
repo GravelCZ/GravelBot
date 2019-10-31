@@ -6,6 +6,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <finalName>bot</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -27,7 +28,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>cz.GravelCZLP.Bot.Main.Main</mainClass>
+                  <mainClass>cz.GravelCZ.Bot.Main.Main</mainClass>
                 </transformer>
               </transformers>
               <filters>

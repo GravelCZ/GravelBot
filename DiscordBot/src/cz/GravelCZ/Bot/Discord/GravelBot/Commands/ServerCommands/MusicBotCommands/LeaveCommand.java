@@ -8,17 +8,19 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class LeaveCommand implements IServerCommand {
 	
 	@Override
 	public void execute(Message msg, TextChannel channel, Guild g, Member sender, String content, String[] args) {
-		if (g.getAudioManager().getConnectedChannel() != null) {
-			GAudioProcessor provider = (GAudioProcessor) g.getAudioManager().getSendingHandler();
-			if (provider.getAudioProvider() instanceof IPlayerProvider) {
+		AudioManager am = g.getAudioManager();
+		if (am.getConnectedChannel() != null) {
+			GAudioProcessor provider = (GAudioProcessor) am.getSendingHandler();
+			if (provider != null && provider.getAudioProvider() instanceof IPlayerProvider) {
 				((IPlayerProvider) provider.getAudioProvider()).close();
 			}
-			g.getAudioManager().closeAudioConnection();
+			am.closeAudioConnection();
 			
 			sendMessage(channel, "I left, i guess you dont like me ;(");
 		} else {

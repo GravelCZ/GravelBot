@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class YoutubeCommand implements IServerCommand {
 
@@ -101,7 +102,15 @@ public class YoutubeCommand implements IServerCommand {
 				}
 			}
 			try {
-				GAudioProcessor processor = (GAudioProcessor) g.getAudioManager().getSendingHandler();
+				AudioManager am = g.getAudioManager();
+				GAudioProcessor processor = (GAudioProcessor) am.getSendingHandler();
+				
+				if (processor == null) {
+					processor = new GAudioProcessor();
+					am.setReceivingHandler(processor);
+					am.setSendingHandler(processor);
+					am.setAutoReconnect(true);
+				}
 				
 				if (processor.getAudioProvider() instanceof IPlayerProvider) {
 					((IPlayerProvider) processor.getAudioProvider()).close();

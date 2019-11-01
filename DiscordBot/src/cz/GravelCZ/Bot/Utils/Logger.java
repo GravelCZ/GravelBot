@@ -20,6 +20,10 @@ public class Logger {
 		System.out.println(getDate() + " - [INFO] - " + string);
 	}
 
+	public static void log(Object o) {
+		System.out.println(getDate() + " - [INFO] - " + o);
+	}
+	
 	public static void debug(String string) {
 		if (debug) {
 			System.out.println(getDate() + " - [DEBUG] - " + string);	

@@ -10,15 +10,15 @@ import cz.GravelCZ.Bot.Discord.ProgramatoriBot.Listeners.ProgListener;
 import cz.GravelCZ.Bot.Main.Constants;
 import cz.GravelCZ.Bot.Main.Main;
 import cz.GravelCZ.Bot.Utils.Utils;
+import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class ProgramatoriBot extends ListenerAdapter implements IDiscordBot {
+public class ProgramatoriBot implements IDiscordBot {
 
 	private String roleChannel = null;
+	
+	private JDA jda;
 	
 	@Override
 	public void init(Main m) {
@@ -40,29 +40,24 @@ public class ProgramatoriBot extends ListenerAdapter implements IDiscordBot {
 			e.printStackTrace();
 		}
 		
-		JDABuilder builder = new JDABuilder();
+		JDABuilder builder = new JDABuilder(AccountType.BOT);
 		builder.setToken(Constants.programatoriBotKey);
+		builder.addEventListeners(new ProgListener(this));
 		
-		JDA jda = null;
+		
 		try {
 			jda = builder.build();
 			jda.awaitReady();
 		} catch (LoginException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		jda.addEventListener(new ProgListener(this), this);
 	}
 
 	@Override
 	public void shutdown() {
 		File f = new File("./BotDataFolder/programmingBot.txt");
 		Utils.writeToFile(f, "cfg;roleChannel;" + roleChannel);
-	}
-
-	@Override
-	public void onReady(ReadyEvent e) {
-		e.getJDA().getPresence().setActivity(Activity.listening(" your role requests."));
+		jda.shutdown();
 	}
 	
 	public void setRoleChannel(String s) {

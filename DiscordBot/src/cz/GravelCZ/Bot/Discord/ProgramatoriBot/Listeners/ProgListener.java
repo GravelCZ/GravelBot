@@ -12,11 +12,13 @@ import cz.GravelCZ.Bot.Discord.ProgramatoriBot.ProgramatoriBot;
 import cz.GravelCZ.Bot.Main.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class ProgListener  extends ListenerAdapter {
@@ -25,6 +27,11 @@ public class ProgListener  extends ListenerAdapter {
 
 	public ProgListener(ProgramatoriBot bot) {
 		this.bot = bot;
+	}
+	
+	@Override
+	public void onReady(ReadyEvent e) {
+		e.getJDA().getPresence().setActivity(Activity.listening(" your role requests."));
 	}
 	
 	@Override
@@ -72,11 +79,11 @@ public class ProgListener  extends ListenerAdapter {
 								}
 								
 								roles.forEach(role -> {
-									if (role.hasPermission(Permission.ADMINISTRATOR)) {
+									if (role.getName().contains("Admin")) {
 										c.sendMessage(m.getAsMention() + " tak takhle blbej fakt nejsem :D admina ti dávat nebudu.").queue();
 										return;
 									}
-									g.addRoleToMember(m, role);
+									g.addRoleToMember(m, role).queue();
 									b.append("Dal jsem ti roli: " + role.getName() + "\n");
 								});
 								
@@ -85,11 +92,11 @@ public class ProgListener  extends ListenerAdapter {
 								Optional<Role> roleop = g.getRoles().stream()
 										.filter(r -> r.getName().equalsIgnoreCase(args[0])).findFirst();
 								if (roleop.isPresent()) {
-									if (isAdminRole(roleop.get())) {
+									if (roleop.get().getName().contains("Admin")) {
 										c.sendMessage(m.getAsMention() + " tak takhle blbej fakt nejsem :D").queue();
 										return;
 									}
-									g.addRoleToMember(m, roleop.get());
+									g.addRoleToMember(m, roleop.get()).queue();;
 									c.sendMessage(m.getAsMention() + " Dal jsem ti roli: " + roleop.get().getName()).queue();
 								} else {
 									c.sendMessage(m.getAsMention() + " Tato role/programovací jazyk neexistuje. Pokud ano, kontaktuj adminy aby jej přidali.").queue();
@@ -106,14 +113,13 @@ public class ProgListener  extends ListenerAdapter {
 								c.sendMessage(m.getAsMention() + " tuto roli nemáš.").queue();
 								return;
 							}
-							if (isAdminRole(role.get(0))) {
+							if (role.get(0).getName().contains("Admin")) {
 								c.sendMessage(m.getAsMention() + " tak takhle blbej fakt nejsem :D").queue();
 								return;
 							}
-							g.removeRoleFromMember(m, role.get(0));
+							g.removeRoleFromMember(m, role.get(0)).queue();
 							c.sendMessage(m.getAsMention() + " Odebral jsem ti roli: " + role.get(0).getName()).queue();
 						} else if (alias.equalsIgnoreCase("setchannel")) {
-							
 							if (m.getRoles().stream().anyMatch(r -> r.getPermissions().contains(Permission.ADMINISTRATOR))) {
 								if (args.length == 0) {
 									c.sendMessage(m.getAsMention() + " Řekni mi, jakej kanál mám použít.").queue();
@@ -161,10 +167,6 @@ public class ProgListener  extends ListenerAdapter {
 			}
 		});
 		t.start();
-	}
-
-	public boolean isAdminRole(Role r) {
-		return r.getPermissions().contains(Permission.ADMINISTRATOR);
 	}
 
 }

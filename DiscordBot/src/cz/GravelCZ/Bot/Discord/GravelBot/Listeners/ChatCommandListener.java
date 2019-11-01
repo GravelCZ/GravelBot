@@ -55,6 +55,11 @@ public class ChatCommandListener extends ListenerAdapter {
 		Message msg = e.getMessage();
 		PrivateChannel channel = e.getChannel();
 		User user = e.getAuthor();
+		
+		if (channel.getJDA().getSelfUser().getId().equals(user.getId())) {
+			return;
+		}
+		
 		String content = msg.getContentRaw();
 
 		String[] params = content.split("\\ +");
@@ -91,6 +96,10 @@ public class ChatCommandListener extends ListenerAdapter {
 		Guild g = e.getGuild();
 		String content = msg.getContentRaw();
 
+		if (g.getSelfMember().equals(m)) {
+			return;
+		}
+		
 		String[] params = content.split("\\ +");
 		String alias = params[0].replaceFirst(Constants.commandPrefix, "");
 		String[] args = Arrays.copyOfRange(params, 1, params.length);

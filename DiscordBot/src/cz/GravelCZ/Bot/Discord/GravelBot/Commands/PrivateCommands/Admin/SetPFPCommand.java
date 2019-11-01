@@ -108,7 +108,7 @@ public class SetPFPCommand implements IPrivateCommand {
 		
 		if (f.exists()) {
 			try {
-				msg.getJDA().getSelfUser().getManager().setAvatar(Icon.from(f));
+				msg.getJDA().getSelfUser().getManager().setAvatar(Icon.from(f)).queue();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

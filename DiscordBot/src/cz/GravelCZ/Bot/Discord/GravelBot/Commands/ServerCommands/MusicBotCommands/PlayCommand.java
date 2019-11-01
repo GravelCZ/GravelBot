@@ -10,31 +10,33 @@ import cz.GravelCZ.Bot.Discord.GravelBot.Audio.AudioProviders.IPlayerProvider;
 import cz.GravelCZ.Bot.Discord.GravelBot.Commands.IServerCommand;
 import cz.GravelCZ.Bot.Discord.GravelBot.Commands.PermissionsService;
 import cz.GravelCZ.Bot.Main.Constants;
-import cz.GravelCZ.Bot.Utils.Logger;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class PlayCommand implements IServerCommand {
 
 	@Override
 	public void execute(Message msg, TextChannel channel, Guild g, Member sender, String content, String[] args) {
-		GAudioProcessor processor = (GAudioProcessor) g.getAudioManager().getSendingHandler();//guild.getAudioManager().getAudioProvider();
+		AudioManager am = g.getAudioManager();
+		GAudioProcessor processor = (GAudioProcessor) am.getSendingHandler();
 		if (processor != null) {
 			if (processor.getAudioProvider() instanceof IPlayerProvider) {
 				((IPlayerProvider) processor.getAudioProvider()).close();
 			}
 		} else {
 			processor = new GAudioProcessor();
-			g.getAudioManager().setSendingHandler(processor);
-			g.getAudioManager().setReceivingHandler(processor);
+			am.setReceivingHandler(processor);
+			am.setSendingHandler(processor);
+			am.setAutoReconnect(true);
 		}
 		
 		
-		if (!g.getAudioManager().isConnected()) {
+		if (!am.isConnected()) {
 			if (!sender.getVoiceState().inVoiceChannel()) {
 				sendMessage(channel, "You are not in a voice channel.");
 				return;
@@ -52,7 +54,6 @@ public class PlayCommand implements IServerCommand {
 	
 		if (args.length == 0) {
 			try {
-				Logger.log("" + (processor == null));
 				processor.setAudioProvider(new HttpAudioProvider(new URL(Constants.local_audio)));
 			} catch (Exception e1) {
 				e1.printStackTrace();

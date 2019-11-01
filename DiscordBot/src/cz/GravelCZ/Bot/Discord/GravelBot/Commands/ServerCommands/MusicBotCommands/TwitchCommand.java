@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class TwitchCommand implements IServerCommand {
 	
@@ -91,17 +92,26 @@ public class TwitchCommand implements IServerCommand {
 				}
 			}
 			try {
-				GAudioProcessor processor = (GAudioProcessor) g.getAudioManager().getSendingHandler();
+				AudioManager am = g.getAudioManager();
+				GAudioProcessor processor = (GAudioProcessor) am.getSendingHandler();
+				
+				if (processor == null) {
+					processor = new GAudioProcessor();
+					am.setReceivingHandler(processor);
+					am.setSendingHandler(processor);
+					am.setAutoReconnect(true);
+				}
+				
 				if (processor.getAudioProvider() instanceof IPlayerProvider) {
 					((IPlayerProvider) processor.getAudioProvider()).close();
 				}
+				
+				processor.getAudioProcessor().setVolume(0.5d);
 				processor.setAudioProvider(new TwitchAudioProvider(name, g));
 			} catch (Exception e) {
 				sendMessage(channel, "Internal error occured: " + e.getClass().getName() + ": " + e.getMessage());
 				e.printStackTrace();
 			}
-			GAudioProcessor p = (GAudioProcessor) g.getAudioManager().getSendingHandler();
-			p.getAudioProcessor().setVolume(0.5d);
 			
 			JSONObject userStreamDataobj = streamInfoObj.getJSONObject("stream");
 			

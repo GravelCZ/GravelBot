@@ -43,9 +43,7 @@ public class ServerHelpCommand implements IServerCommand {
 		b.addField("!/volume [0 to 100]", "Sets the volume of the bot. If you go too high he __**might not like that**__.", false);
 		b.addField("__QnA__:", "It is QnA Time", false);
 		b.addField("How many possible questions are there ?", "About **" + Utils.getLoadedQuestions() + "**", false);
-		b.addField("Who is the (cute) girl the bot has as a profile picture ?", "It is Yuno Gasai from Mirai Nikki when she goes **full psycho!**", false);
-		b.addField("__I GUESS__", "__**THEY**__", true);
-		b.addField("__NEVER MISS__", "__**HUH?**__", true);
+		b.addField("Who is the (cute) girl the bot has as a profile picture ?", "It is Zero Two from Darling in the Franxx", false);
 		sendMessage(sender.getUser().openPrivateChannel().complete(), b.build());
 	}
 
